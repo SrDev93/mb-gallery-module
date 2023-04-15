@@ -19,7 +19,13 @@ class GalleryController extends Controller
      */
     public function index()
     {
-        $items = Gallery::all();
+        if (\request()->session()->has('brand_id')){
+            $items = Gallery::where('brand_id', \request()->session()->get('brand_id'))->get();
+        }elseif (Auth::user()->brand_id) {
+            $items = Gallery::where('brand_id', Auth::user()->brand_id)->get();
+        }else {
+            $items = Gallery::all();
+        }
 
         return view('gallery::index', compact('items'));
     }
@@ -30,7 +36,9 @@ class GalleryController extends Controller
      */
     public function create()
     {
-        if (Auth::user()->brand_id) {
+        if (\request()->session()->has('brand_id')){
+            $categories = GalleryCategory::where('brand_id', \request()->session()->get('brand_id'))->whereNull('parent_id')->orderBy('sort_id')->get();
+        }elseif (Auth::user()->brand_id) {
             $categories = GalleryCategory::where('brand_id', Auth::user()->brand_id)->whereNull('parent_id')->orderBy('sort_id')->get();
         }else {
             $categories = GalleryCategory::whereNull('parent_id')->orderBy('sort_id')->get();
@@ -93,7 +101,9 @@ class GalleryController extends Controller
      */
     public function edit(Gallery $gallery)
     {
-        if (Auth::user()->brand_id) {
+        if (\request()->session()->has('brand_id')){
+            $categories = GalleryCategory::where('brand_id', \request()->session()->get('brand_id'))->whereNull('parent_id')->orderBy('sort_id')->get();
+        }elseif (Auth::user()->brand_id) {
             $categories = GalleryCategory::where('brand_id', Auth::user()->brand_id)->whereNull('parent_id')->orderBy('sort_id')->get();
         }else {
             $categories = GalleryCategory::whereNull('parent_id')->orderBy('sort_id')->get();

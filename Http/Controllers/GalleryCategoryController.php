@@ -17,7 +17,9 @@ class GalleryCategoryController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->brand_id) {
+        if (\request()->session()->has('brand_id')){
+            $categories = GalleryCategory::where('brand_id', \request()->session()->get('brand_id'))->whereNull('parent_id')->orderBy('sort_id')->get();
+        }elseif (Auth::user()->brand_id) {
             $categories = GalleryCategory::where('brand_id', Auth::user()->brand_id)->whereNull('parent_id')->orderBy('sort_id')->get();
         }else {
             $categories = GalleryCategory::whereNull('parent_id')->orderBy('sort_id')->get();
